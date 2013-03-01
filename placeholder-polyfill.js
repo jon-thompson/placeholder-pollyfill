@@ -14,19 +14,6 @@
 			color: '#999'
 		};
 
-	function positionPlaceholder(element) {
-		var placeholder = element.placeholder,
-			position;
-
-		position = element.position();
-
-		// Copy the style of the textbox as necessary
-		placeholder.css({
-			top: position.top,
-			left: position.left
-		});
-	}
-
 	function hidePlaceholder(element) {
 		element.css('color', element.defaultTextColor);
 
@@ -54,7 +41,10 @@
 	// Applies the polyfill to an element
 	function applyPolyfill(element) {
 		var placeholder,
-			position;
+			position = element.position();
+
+		// The parent container needs to be position: relative;
+		element.parent().css('position', 'relative');
 
 		placeholder = $('<input/>').
 			val(placeholderText(element))
@@ -74,15 +64,14 @@
 				paddingRight: element.css('padding-right'),
 				paddingBottom: element.css('padding-bottom'),
 				lineHeight: element.css('line-height'),
-				color: settings.color
+				color: settings.color,
+				top: position.top,
+				left: position.left
 			});
 
 		// Save some configuration on the element
 		element.placeholder = placeholder;
 		placeholder.insertBefore(element);
-
-		// Position it
-		positionPlaceholder(element);
 
 		// Populate the placeholder if the field is empty now
 		if (element.val() === '') {
@@ -102,14 +91,6 @@
 				showPlaceholder(element);
 			}
 		});
-
-		element.parents('form').on('submit', function () {
-			positionPlaceholder(placeholder);
-		});
-
-		setInterval(function () {
-			positionPlaceholder(element);
-		}, 25);
 	}
 
 	// Initializes the polyfill
